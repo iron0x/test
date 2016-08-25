@@ -2,41 +2,34 @@
 
 $content = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'ecshop.sql');
 
-# replace unsigned ''
-# replace ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=28 ''
-# replace \r\n \n
-# CHARACTER SET utf8 COLLATE utf8_bin
-$content = preg_replace(['/\).*?;/', '/unsigned /', '/\\r\\n/', '/CHARACTER SET utf8 COLLATE utf8_bin /'], [');', '', "\n", ''],$content);
+#$content = str_replace(['unsigned', ], ['', ], $content);
+
+# delete ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=418
+$content = preg_replace(['/\).*?;/', '/unsigned /', '/\\r\\n/'], [');', '', "\n"],$content);
+
+// $content = preg_replace
+// (
+// 	['/mediumint\(\d+\)/', '/unsigned/', '/varchar\(\d+\)/', '/tinyint\(\d+\)/', '/AUTO_INCREMENT/'],
+// 	['intger', '', 'text', 'intger', ''],
+// 	$content
+// );
+
+// $content = preg_replace
+// (
+//   ['/mediumint\(\d+\)/', '/unsigned/', '/varchar\(\d+\)/', '/tinyint\(\d+\)/', '/AUTO_INCREMENT/'],
+//   ['intger', '', 'text', 'intger', ''],
+//   $content
+// );
 
 $m = [];
-$str = '';
 
 preg_match_all('/CREATE TABLE.*?\);/s', $content, $m);
 
-foreach ($m[0] as $k => $v) {
-  # get tableName
-  preg_match_all('/TABLE.*?(`\w+`)/', $v, $tableNameA);
-  $tableName = $tableNameA[1][0];
-  # get sql
-  # replace
-  $sstr = preg_replace(['/`(\w+)`.*?AUTO_INCREMENT.*?,/', '/,\s+PRIMARY KEY.*?\);/s', '/COMMENT\s+\'.*?\'/'], ['`\1` INTEGER PRIMARY KEY AUTOINCREMENT,', "\n);\n", ''], $v);
-  $str .= preg_replace('/,\s+KEY `.*?\);/s', "\n);\n", $sstr);
-  # get index
-  preg_match_all('/,\s+KEY\s+(`\w+`)\s+\((`\w+`)\)/s', $v, $indexs);
-  foreach ($indexs[0] as $ik => $iv) {
-    $indexName = rtrim($indexs[1][$ik], '`').'_'.ltrim($tableName, '`');
-    $indexCol  = $indexs[2][$ik];
-    $str .= "CREATE INDEX {$indexName} ON {$tableName} ({$indexCol});\n";
-  }
-}
+var_dump($m[0][1]);
 
-file_put_contents(__DIR__.DIRECTORY_SEPARATOR.'ecshop.sqlite', $str);exit;
+preg_match_all('/TABLE.*?(`\w+`)/', $m[0][1], $s);
 
-echo $str;exit;
-
-#var_dump($m[0][1]);
-
-
+$tableName = $s[1][0];
 
 #preg_match_all('/,\s+KEY\s+`(\w+)`\s+\(`(\w+)`\)/s', $m[0][1], $s);
 
@@ -48,7 +41,13 @@ var_dump($s);
 exit;
 $str = '';
 
+foreach ($m[0] as $v) {
+  # get index
+  preg_match_all('//', $v, $m);
 
+  # replace
+  $str .= preg_replace(['/`(\w+)`.*?AUTO_INCREMENT.*?,/', '/,\s+PRIMARY KEY.*?\);/s'], ['`\1` INTEGER PRIMARY KEY AUTOINCREMENT,', "\n);\n"], $v);
+}
 
 #$str = explode("\n", $m[0][0]);
 

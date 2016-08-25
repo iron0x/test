@@ -19,8 +19,7 @@ foreach ($m[0] as $k => $v) {
   $tableName = $tableNameA[1][0];
   # get sql
   # replace
-  $sstr = preg_replace(['/`(\w+)`.*?AUTO_INCREMENT.*?,/', '/,\s+PRIMARY KEY.*?\);/s', '/COMMENT\s+\'.*?\'/'], ['`\1` INTEGER PRIMARY KEY AUTOINCREMENT,', "\n);\n", ''], $v);
-  $str .= preg_replace('/,\s+KEY `.*?\);/s', "\n);\n", $sstr);
+  $str .= preg_replace(['/`(\w+)`.*?AUTO_INCREMENT.*?,/', '/,\s+PRIMARY KEY.*?\);/s'], ['`\1` INTEGER PRIMARY KEY AUTOINCREMENT,', "\n);\n"], $v);
   # get index
   preg_match_all('/,\s+KEY\s+(`\w+`)\s+\((`\w+`)\)/s', $v, $indexs);
   foreach ($indexs[0] as $ik => $iv) {
