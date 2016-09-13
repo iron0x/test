@@ -23,19 +23,21 @@ class Action
         if (!method_exists($this,'do')) {
             throw new Exception("Error class", 002);
         }
+        $do = new ReflectionMethod($this, 'do');
+        $do->setAccessible(true);
         if ($this->paramsEmpty) {
-            $res = call_user_func(array($this, 'do'));
+            $res = $do->invoke($this);
         }
         else
         {
-            $res = call_user_func_array(array($this, 'do'), $this->params);
+            $res = $do->invokeArgs($this, $this->params);
         }
         return $res;
     }
 
     protected function getParams()
     {
-        foreach ($params as $name => $value) {
+        foreach ($this->paramsRules as $name => $value) {
             $tmp = $this->getValue($value[0], $name, $value[2]);
 
             if ($tmp === null) {
@@ -47,7 +49,7 @@ class Action
                 }
             }
 
-            if (isset($value[4])) {
+            if (isset($value[4]) && preg_match('/^[A-Za-z_]+/', $value[4])) {
                 if (!$value[4]($tmp)) {
                     throw new Exception("This is not the normal way of using the parameter '{$name}'", 102);
                 }
@@ -63,16 +65,29 @@ class Action
         switch($receiveMethod)
         {
             case 'post':
-                // $tempValue = isset($_POST[$name]) ? ($type)$_POST[$name] : null;
                 $tempValue = isset($_POST[$name]) ? $_POST[$name] : null;
                 break;
             case 'get':
-                // $tempValue = isset($_GET[$name]) ? ($type)$_GET[$name] : null;
                 $tempValue = isset($_GET[$name]) ? $_GET[$name] : null;
                 break;
             default :
                 $tempValue = null;
                 break;
+        }
+        if ($tempValue !== null) {
+            switch ($type) {
+                case 'integer':
+                    $tempValue = (int)$tempValue;
+                    break;
+                case 'float':
+                    $tempValue = (float)$tempValue;
+                    break;
+                case 'string':
+                    $tempValue = (string)$tempValue;
+                    break;
+                default:
+                    break;
+            }
         }
         return $tempValue;
     }

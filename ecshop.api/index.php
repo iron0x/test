@@ -3,6 +3,8 @@
 # root
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', __DIR__.DS);
+define('APP_NAME', 'test');
+define('APP_PATH', ROOT.'test'.DS);
 define('DEBUG', isset($_GET['d']) ? true : false);
 # error
 error_reporting(E_ALL);
@@ -38,17 +40,21 @@ $router = new Router;
 list($controllerName, $actionName) = $router->resolve();
 # router end
 
+require APP_PATH.$controllerName.'.class.php';
 $controller = new $controllerName;
 if ($controller->getActionRule($actionName) && !(isset($_SESSION['isLogin']) & $_SESSION['isLogin'])) {
     throw new Exception('must login', 001);
 }
 
-$action = new $actionName;
-try {
-    $res = $action->run();
-} catch (Exception $e) {
-    
+if ($action = $controller->getAction($actionName))
+{
+    try {
+        $res = $action->run();
+    } catch (Exception $e) {
+        
+    }
 }
+
 
 var_dump($res);exit;
 
