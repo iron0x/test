@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="main.css">
+	<script type="text/javascript" src="jquery-3.1.0.slim.min.js"></script>
+	<script type="text/javascript">
+		$(
+			function()
+			{
+				var data = 
+				[
+					{
+						"className" : "User",
+						"apis"		: 
+						[
+							{
+								"apiName"	: 	"login",
+								"apiUrl"	: 	"user/login",
+								"params"	: 	[
+									{
+										"paramName"		: 	"username",
+										"paramMethod"	: 	"get",
+										"must"			: 	1
+									},
+									{
+										"paramName"		: 	"password",
+										"paramMethod"	: 	"get",
+										"must"			: 	0
+									},
+								]
+							}
+						]
+					},
+				];
+				var classList = '';
+				for(var i in data)
+				{
+					classList += '<option value="'+i+'">'+data[i].className+'</option>';
+				}
+				$('#typeSelector').append(classList);
+
+				$('#typeSelector').change
+				(
+					function()
+					{
+						var index = $(this).val();
+						var _apis = data[index].apis;
+						var apiList = '<option value="">please select api first</option>';
+						for(var i in _apis)
+						{
+							apiList += '<option index="'+i+'" value="'+_apis[i].apiUrl+'">'+_apis[i].apiName+' '+_apis[i].apiUrl+'</option>';
+						}
+						$('#formSelector').empty().append(apiList);
+						$('.params').empty();
+					}
+				);
+
+				$('#formSelector').change
+				(
+					function()
+					{
+						var _i = $('#typeSelector').val();
+						var index = $(this).find('option:selected').attr('index');
+						var _params = data[_i].apis[index].params;
+						var paramsList = '';
+						for(var i in _params)
+						{
+							var mustx = '';
+							var musts = '';
+							if(_params[i].must == 1)
+							{
+								mustx = '<span class="red">*</span>';
+								musts = '<span class="tips">调用接口凭证</span><span class="errMsg red">该项不能为空</span>';
+							}
+							paramsList += '<div class="inputDiv params">'+mustx+'<span class="name">'+_params[i].paramName+' : </span><input type="text" reserved-name="'+_params[i].paramName+'" method="'+_params[i].paramMethod+'" data-type="string" required="true" sync="true">'+musts+'<br></div>';
+						}
+						$('.params').remove();
+						$('#formContainer').prepend(paramsList);
+					}
+				);
+			}
+		);
+	</script>
+</head>
+<body>
+	<div id="content" class="content">
+		<div id="typeSelectorDiv" class="frm_control_group">
+			<label class="frm_label">一、接口类型：</label>
+			<div class="frm_controls">
+				<select id="typeSelector" class="frm_input_box">
+					<option value="">please select api</option>
+				</select>
+			</div>
+		</div>
+		<div id="formSelectorDiv" class="frm_control_group">
+			<label class="frm_label">二、接口列表：</label>
+			<div class="frm_controls">
+				<select id="formSelector" class="frm_input_box">
+					<option value="">please select api first</option>
+				</select>
+			</div>
+		</div>                          
+		<div id="formContent" class="frm_control_group">
+			<label>三、参数列表：</label>
+			<div id="formContainer">
+<!--				<div class="inputDiv params">					
+					<span class="red">*</span>
+					<span class="name">access_token : </span>
+					<input type="text" reserved-name="access_token" method="GET" data-type="string" required="true" sync="true">
+					<span class="tips">调用接口凭证</span>
+					<span class="errMsg red">该项不能为空</span>
+					<br>
+				</div>-->
+				<button id="submit"> submit </button>
+				<div class="inputDiv">					
+					<span class="red">*</span>
+					<span class="name">body : </span>
+					<textarea cols="70" rows="15" name="body" method="POST" data-type="content" required="true"></textarea>
+					<span class="tips">调用接口的数据json包</span>
+					<span class="errMsg"></span>
+					<br>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

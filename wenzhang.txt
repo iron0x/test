@@ -1,0 +1,27 @@
+编写可靠shell脚本的八个建议 https://segmentfault.com/a/1190000006900083
+
+https://segmentfault.com/
+
+Hadoop集群搭建笔记 http://www.tuicool.com/articles/U3UB3aZ
+
+http://www.tuicool.com/articles/aMVNJfE
+
+http://www.tuicool.com/articles/7bA7B3E
+
+http://www.tuicool.com/articles/IBjquiQ
+
+http://www.tuicool.com/articles/ayyAFbq
+
+http://blog.jobbole.com/105731/
+
+http://www.tuicool.com/articles/7ramYz6
+
+http://www.tuicool.com/articles/rmMBZje
+
+http://www.tuicool.com/articles/2QvuyaY
+
+http://www.tuicool.com/articles/Ffiymaz
+
+http://www.yunweipai.com/archives/9600.html
+
+JSON.stringify($(this).find('option:selected').attr('index'))
