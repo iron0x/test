@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?><h1>11:33:19</h1>

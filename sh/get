@@ -1,0 +1,10 @@
+#!/bin/env php
+<?php
+$url = 'http://www.baidu.com/';
+
+$html = file_get_contents($url);
+
+$pattern = '/href="(.*?g)"/';
+preg_match_all($pattern, $html, $m);
+
+var_dump($m);

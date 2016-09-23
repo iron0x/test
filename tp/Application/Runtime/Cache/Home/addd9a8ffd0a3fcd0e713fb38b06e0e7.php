@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>/home/code/git/test/tp/Application/Common/Common<br />7<br />Common\Common\CommonController<br />Common\Common\CommonController::_initialize<br /><h1>11:52:35</h1>Home<br />Index<br />i<br />
