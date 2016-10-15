@@ -1,0 +1,165 @@
+1111111111111111111111111111111111111111111111111111111111
+PHP免扩展加密(混淆加密)的基本原理(一)基本原理
+发布时间:2014-11-06 08:57:06
+PHP免扩展加密近几年非常流行，今天就给大家介绍一下基本的加密原理。
+PHP源码：
+<?php
+echo 'hello by phpjiami.com';
+?>
+我们对些代码码加密，所使用为：eval，base64_decode,base64_encode
+EVAL:
+定义和用法
+eval() 函数把字符串按照 PHP 代码来计算。
+该字符串必须是合法的 PHP 代码，且必须以分号结尾。
+如果没有在代码字符串中调用 return 语句，则返回 NULL。如果代码中存在解析错误，则 eval() 函数返回 false。
+base64_decode,base64_encode
+则是完成BASE64的加密及解密.
+第一层处理，完成代码的执行：
+<?php
+eval("echo 'hello by phpjiami.com';");
+?>
+第二层完成加密：
+<?php
+eval(base64_decode("ZWNobyAnaGVsbG8gYnkgcGhwamlhbWkuY29tJzs="));
+?>
+先对 echo 'hello by phpjiami.com'; 进行  base64_encode，得到：ZWNobyAnaGVsbG8gYnkgcGhwamlhbWkuY29tJzs= 然后再使用 base64_decode 还原base64数据,最后通过eval来执行.
+这样我们就实现了简单的加密，再复杂的加密过程我们下次再说。
+
+
+PHP免扩展加密(混淆加密)的基本原理(二)数据混淆
+发布时间:2014-11-28 10:57:06
+看代码吧!
+
+<?php
+function phpencode($code) {
+$code = str_replace(array('<?php','?>','<?PHP'),array('','',''),$code);
+$encode = base64_encode(gzdeflate($code));// 开始编码
+$encode = '<?php'."\neval(gzinflate(base64_decode("."'".$encode."'".")));\n?>";
+return $encode;
+}
+function phpdecode($code) {
+$code = str_replace(array('<!?php','<?PHP',"eval(gzinflate(base64_decode('","')));",'?>'),array('','','','','',''),$code);
+$decode = base64_decode($code);
+$decode = @gzinflate($decode);
+return $decode;
+}
+?>
+</span></p><form method="post">
+<textarea name="source" cols="55" rows="8">
+<?php
+if(!empty($_POST['source'])) {
+if($_POST['button']=='加密') {
+echo htmlspecialchars(phpencode(stripcslashes($_POST['source'])));
+}
+if($_POST['button']=='解密') {
+echo htmlspecialchars(phpdecode(stripcslashes($_POST['source'])));
+}
+}
+?>
+</textarea>
+<?php
+if(!empty($_POST['source']))
+{
+if($_POST['button']=='加密') 
+{
+echo '加密成功.';
+}
+if($_POST['button']=='解密') {
+echo '解密成功.';
+}
+}else{
+echo '操作失败';
+}
+?>
+<input type="submit" name="button" value="加密">
+<input type="submit" name="button" value="解密">
+</form>
+
+这里对刚才的加密来说,对代码进行了压缩,再base64 相比较之前的较为安全. 下面是微盾的加密代码,相比上面的加密,增加了混淆操作.
+
+<?php // This file is protected by copyright law & provided under license. Copyright(C) 2005-2009 www.vidun.com, All rights reserved.
+$OOO0O0O00=__FILE__;$OOO000000=urldecode('%74%68%36%73%62%65%68%71%6c%61%34%63%6f%5f%73%61%64%66%70%6e%72');$OO00O0000=244;$OOO0000O0=$OOO000000{4}.$OOO000000{9}.$OOO000000{3}.$OOO000000{5};$OOO0000O0.=$OOO000000{2}.$OOO000000{10}.$OOO000000{13}.$OOO000000{16};$OOO0000O0.=$OOO0000O0{3}.$OOO000000{11}.$OOO000000{12}.$OOO0000O0{7}.$OOO000000{5};$O0O0000O0='OOO0000O0';eval(($$O0O0000O0('JE9PME9PMDAwMD0kT09PMDAwMDAwezE3fS4kT09PMDAwMDAwezEyfS4kT09PMDAwMDAwezE4fS4kT09PMDAwMDAwezV9LiRPT08wMDAwMDB7MTl9O2lmKCEwKSRPMDAwTzBPMDA9JE9PME9PMDAwMCgkT09PME8wTzAwLCdyYicpOyRPTzBPTzAwME89JE9PTzAwMDAwMHsxN30uJE9PTzAwMDAwMHsyMH0uJE9PTzAwMDAwMHs1fS4kT09PMDAwMDAwezl9LiRPT08wMDAwMDB7MTZ9OyRPTzBPTzAwTzA9JE9PTzAwMDAwMHsxNH0uJE9PTzAwMDAwMHswfS4kT09PMDAwMDAwezIwfS4kT09PMDAwMDAwezB9LiRPT08wMDAwMDB7MjB9OyRPTzBPTzAwME8oJE8wMDBPME8wMCwxMjYwKTskT08wME8wME8wPSgkT09PMDAwME8wKCRPTzBPTzAwTzAoJE9PME9PMDAwTygkTzAwME8wTzAwLDM4MCksJ0VudGVyeW91d2toUkhZS05XT1VUQWFCYkNjRGRGZkdnSWlKakxsTW1QcFFxU3NWdlh4WnowMTIzNDU2Nzg5Ky89JywnQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejAxMjM0NTY3ODkrLycpKSk7ZXZhbCgkT08wME8wME8wKTs=')));return;?>
+
+kr9NHenNHenNHe1zfukgFMaXdoyjcUImb19oUAxyb18mRtwmwJ4LT09NHr8XTzEXRJwmwJXPkr9NTzEXHenNHtILT08XT08XHr8XhtONTznNTzEXHr8Pkr8XHenNHr8XHtXLT08XHr8XHeEXhUXmOB50cbk5d3a3D2iUUylRTlfNaaOnCAkJW2YrcrcMO2fkDApQToxYdanXAbyTF1c2BuiDGjExHjH0YTC3KeLqRz0mRtfnWLYrOAcuUrlhU0xYTL9WAakTayaBa1icBMyJC2OlcMfPDBpqdo1Vd3nxFmY0fbc3Gul6HerZHzW1YjF4KUSvkZLphUL7cMYSd3YlhtONHeEXTznNHeEpK2a2CBXPkr9NHenNHenNHtL7eWplC2ivwtk0DolzwuOlF3WIcBYPdZExHjHibo4JKX0hcBYPdZEJfoipFZn0cbY0woajDo8IYeA2waxVwjSYtJOiNUwxHjHxHjHJKX0hDBCPkoriNUwJhbSYtMajDo8IwmOPDbHIfoazftnpcJEibo4JKX0hgW0hCBwPhTSYtMc1dMY0DB9VwoyJhtLYtmSYtMajDo8Ihtk0DolzwolzwuOlF3WIcmaVC3Opd24iwJL7eWp9eWP=
+
+其中红色部份为混淆的程序,下面蓝色部份为数据. 这样加密比较难处理. 有兴趣的,可以自己去下载微盾.
+下面附上运行的流程代码:
+
+
+这里为当前PHP文件 ,下面为编码的数据
+
+
+$OOO0O0O00=__FILE__;
+$OOO000000=urldecode('%74%68%36%73%62%65%68%71%6c%61%34%63%6f%5f%73%61%64%66%70%6e%72');
+解码后为:th6sbehqla4co_sadfpnr
+下面就是用混淆的O(欧)0(零)要人不易读.
+//************* 2 
+$OO0OO0000=$OOO000000{17}.$OOO000000{12}.$OOO000000{18}.$OOO000000{5}.$OOO000000{19};
+if(!0)$O000O0O00=$OO0OO0000($OOO0O0O00,'rb');$OO0OO000O=$OOO000000{17}.$OOO000000{20}.$OOO000000{5}.$OOO000000{9}.$OOO000000{16};
+$OO0OO00O0=$OOO000000{14}.$OOO000000{0}.$OOO000000{20}.$OOO000000{0}.$OOO000000{20};$OO0OO000O($O000O0O00,1260);
+$OO00O00O0=($OOO0000O0($OO0OO00O0($OO0OO000O($O000O0O00,380),'EnteryouwkhRHYKNWOUTAaBbCcDdFfGgIiJjLlMmPpQqSsVvXxZz0123456789+/=','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/')));
+eval($OO00O00O0);
+
+//************* 1
+$OO00O00O0=str_replace('__FILE__',"'".$OOO0O0O00."'",($OOO0000O0($OO0OO00O0($OO0OO000O($O000O0O00,$OO00O0000),'EnteryouwkhRHYKNWOUTAaBbCcDdFfGgIiJjLlMmPpQqSsVvXxZz0123456789+/=','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'))));fclose($O000O0O00);eval($OO00O00O0);
+
+//************* 1 在这里得到最终的代码了.
+
+echo "this test echo 123!\n";
+echo "this test echo 456!\n";
+
+$a="123123";
+
+if($a!=""){
+
+echo "this test if !\n";
+
+}
+ab();
+function ab()
+{
+echo ("this is test function!");
+}
+
+
+最在结束的最后,后期出现的期他的加密神盾,威盾等等.采用了ascii码 129-255的乱码混淆来实现变量名,造成不易读.这样可以更好的保护代码的执行.但也存在致命的问题.就是无论怎么加密.最终都要还原成明文.这个就是破解的关键所在.在下次,读读这个加密的缺点,还有这个加密壳的资料.
+
+PHP免扩展加密(混淆加密)的基本原理(三)安全加密
+发布时间:2014-12-07 09:37:01
+    今天就来讨论一下,怎么样的加密才安全。
+    免扩展加密之前2章我们简单说明了一下原理，方法。但简单的情况是可以直接破解的，在第二章时我们介绍了混淆的方法。也就是现在主流的加密方法，采用ASCII码：129-255之间的字符来加密，造成代码不可读。但这样的加密现在依然不能防止破解技术，聪明的加密作者想了好多的方法，这里简单文叙述一下。
+    源码-》加密处理（压缩，替换，BASE64，转义）-》安全处理（验证文件MD5值，限制IP、限域名、限时间、防破解、防命令行调试）-》加密程序成品，再简单的说：源码+加密外壳==加密程序。
+    加密处理无非是多次的压缩处理，转换加密我见过某变态程序对源码不集的加密转换，足足进行了50次操作。 要破解的人失去耐心。但这样的安全牺牲的性能太大了。因为我们主要说的是安全性，那就来说说娄全性的问题。
+    1、防止PHP命令行模式,因为我们IIS 或APACHE 都是工作在ISAPI或者CGI模式,是不会出现CLI .可以防止程序破解.
+if (php_sapi_name() == "cli") { 
+  echo "请不要破解本程序"; 
+  exit; 
+}
+    2、MD5的方式，此方式较复杂。一般会将一段加密后的代码，判断MD5值，写入到PHP中。程序运行的时间读取这一段MD5值，并判断。如果值不相同则停止运行。常见的加密文件，不可修改，修改即无法执行也是这个原因。
+
+    3、限IP地址，某一些程序在某一些IP 上是不可运行的。某网站提供破解服务，这个网站的ip地址为：42.121.57.XX，在程序中发现这个IP黑名单则直接拒绝执行。
+
+    4、判断脚本，某破解网站破解脚本文件名为，固定时可用此方法防止破解
+     $_SERVER['SCRIPT_NAME'] == '/xxxxxxxxx.php'   发现此文件名破解则退出.
+    简单总结，以上只是简单说明了一些加密的方法，但加密本身来说不是万能的，没有不被破解的加密程序。此类加密（2014年11月前各类免扩展加密）均存在一个致命的问题，加密外壳作的再牛B，一但被脱去了就得到一切源代码了。这也是所有加密程序可被破解，可被百分百还原的主要原因。2014年11月我们推出出新的加密算法，流程如下：
+    源码--》混淆源码（多种混淆方案可选择，有随机及算法不同方案）-》加密处理--》安全处理--》加密程序成品。
+    此类加密，比原来的程序多了一个混淆源码的操作，本网站全网首推出的功能，推出后已有多个加密同行跟进(我们算法最多,随机方式更强)，即便是被破解了加密外壳，所得到的代码还是经过特别加密混淆处理过的，可以更好的提高系统的防破解能力及安全性。
+    最后，任何加密，混淆都是以牺牲系统性能为代价的，正所谓鱼与熊掌不可兼得！
+
+php加密方法的对比.
+发布时间:2015-03-06 08:27:07
+最近总有网友加我的QQ来向我了解一些PHP的加密，在这里就大家常常搞不懂的PHP加密方法进行罗列并进行简要的介绍。
+1、源码外壳加密（通常加混淆加密，各种加密盾均是此类加密）
+优点：简单，加密容易，现在主流的免扩展加密均是此类方法，本网站也有采用了此类加密方法，加密后无需作什么特别设置直接可使用。
+缺点：加密强度高，执行速度慢。加密强度低，安全性低。我见过某人加密进行了200次循环验证，这样性能很低的。所有的源码混淆加密均可被还原成原代码。
+2、源代码混淆（只打算代码不加密）
+优点：与方案一不同的在于此加密方法是对源代进行加工，加密PHP变量、加密PHP函数、加密PHP字符等，这样加密完的源代码可以正确执行，降低可读性，要拿到源代码的人，也无从下手。
+缺点：源码加密后，不方便修改，严格他并没有加密，只是增加代码不易读的方式，来防止修改二次开发代码。
+3、扩展加密（zend为代表)
+优点：将PHP程序经过某种算法如DES、异或、压缩等算法加密或者对源代码进行预编译提高速度。在PHP加载的扩展(DLL 或 SO) 中完成对源代码的解密解释执行。速度快，安全性高。如果没有破解扩展很难破解此类代码。
+缺点：此类加密，容易被HOOK通过获取OPCODE 转换破解代码，现在主流的ZEND被破解均是因为此类问题。兼容性不好，需要安装第三方扩展方可使用。在安全性方面，远高于方案一
+4、编译功能性扩展
+有点：看着与方案三有一些像但完全不同，他的执行功能是通过C语言编译于扩展中，然后在PHP中调用这样的扩展函数如xxSHOP就使用此类验证加密。因为他不属于功能解释执行PHP代码，所有功能通过C语言直接写出来，应用到PHP扩展中，理论上不能被破解得到源代码（ASM TO C代码重写除外）。
+缺点：扩展兼容性最差，功能升级时需要更新此类扩展文件。牺牲兼容性，而得到安全性。
+
+写在最后，PHP的加密安全性一直是相对的。对于上面的加密四种方案是最常见的，也可以多次组合应用。如先用方案二混淆，再用方案一、方案三、加密。这样更加增强了系统的安全性，本网站所采用的方案均可任组合，更为安全。

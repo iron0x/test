@@ -1,0 +1,108 @@
+PHAR
+http://rango.swoole.com/archives/168
+
+
+PEAR
+全称为PHP扩展与应用库(PHP Extension and Application Repository)。为了创建一个类似于Perl CPAN档案的工具，Stig S. Bakken在1999年创立了PEAR项目。
+
+
+PECL
+PECL 的全称是 The PHP Extension Community Library ，是一个开放的并通过 PEAR(PHP Extension and Application Repository，PHP 扩展和应用仓库)打包格式来打包安装的 PHP扩展库仓库。通过 PEAR 的 Package Manager 的安装管理方式，可以对 PECL 模块进行下载和安装。
+
+
+
+Composer 将这样为你解决问题：
+
+a) 你有一个项目依赖于若干个库。
+
+b) 其中一些库依赖于其他库。
+
+c) 你声明你所依赖的东西。
+
+d) Composer 会找出哪个版本的包需要安装，并安装它们（将它们下载到你的项目中）。
+
+
+声明依赖关系
+
+比方说，你正在创建一个项目，你需要一个库来做日志记录。你决定使用 monolog。为了将它添加到你的项目中，你所需要做的就是创建一个 composer.json 文件，其中描述了项目的依赖关系。
+
+{
+    "require": {
+        "monolog/monolog": "1.2.*"
+    }
+}
+我们只要指出我们的项目需要一些 monolog/monolog 的包，从 1.2 开始的任何版本。
+
+
+
+系统要求
+
+运行 Composer 需要 PHP 5.3.2+ 以上版本。一些敏感的 PHP 设置和编译标志也是必须的，但对于任何不兼容项安装程序都会抛出警告。
+
+我们将从包的来源直接安装，而不是简单的下载 zip 文件，你需要 git 、 svn 或者 hg ，这取决于你载入的包所使用的版本管理系统。
+
+
+
+下载 Composer 的可执行文件
+
+
+局部安装
+
+要真正获取 Composer，我们需要做两件事。首先安装 Composer （同样的，这意味着它将下载到你的项目中）：
+
+curl -sS https://getcomposer.org/installer | php
+注意： 如果上述方法由于某些原因失败了，你还可以通过 php >下载安装器：
+
+php -r "readfile('https://getcomposer.org/installer');" | php
+这将检查一些 PHP 的设置，然后下载 composer.phar 到你的工作目录中。这是 Composer 的二进制文件。这是一个 PHAR 包（PHP 的归档），这是 PHP 的归档格式可以帮助用户在命令行中执行一些操作。
+
+你可以通过 --install-dir 选项指定 Composer 的安装目录（它可以是一个绝对或相对路径）：
+
+curl -sS https://getcomposer.org/installer | php -- --install-dir=bin
+
+全局安装
+
+你可以将此文件放在任何地方。如果你把它放在系统的 PATH 目录中，你就能在全局访问它。 在类Unix系统中，你甚至可以在使用时不加 php 前缀。
+
+你可以执行这些命令让 composer 在你的系统中进行全局调用：
+
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+注意： 如果上诉命令因为权限执行失败， 请使用 sudo 再次尝试运行 mv 那行命令。
+
+现在只需要运行 composer 命令就可以使用 Composer 而不需要输入 php composer.phar。
+
+
+
+
+
+使用 Composer
+
+现在我们将使用 Composer 来安装项目的依赖。如果在当前目录下没有一个 composer.json 文件，请查看基本用法章节。
+
+要解决和下载依赖，请执行 install 命令：
+
+php composer.phar install
+
+
+
+自动加载
+
+除了库的下载，Composer 还准备了一个自动加载文件，它可以加载 Composer 下载的库中所有的类文件。使用它，你只需要将下面这行代码添加到你项目的引导文件中：
+
+require 'vendor/autoload.php';
+
+
+
+
+你也可以仅执行 --check 选项而无需下载 Composer。 要获取更多的信息请使用 --help。
+
+curl -sS https://getcomposer.org/installer | php -- --help
+
+--不能省略
+
+
+
+
+
+
